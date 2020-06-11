@@ -13,7 +13,12 @@
 2) Код товара
 3) Категория (можно цифрой, можно прям словами)
 
+Postman collection at ./store-service/items.postman_collection.json
+
 ## Run with docker
 ```(bash)
 docker-compose up --build
 ```
+
+## Architecture
+![](architecture.png)
