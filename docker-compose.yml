@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  pg:
+    image: postgres
+    environment:
+      - 'POSTGRES_PASSWORD=$POSTGRES_PASSWORD'
+    restart: unless-stopped
+
+  web:
+    build: 'store-service'
+    depends_on:
+      - pg
+    environment:
+      - 'DB_PASSWORD=$POSTGRES_PASSWORD'
+      - 'DB_HOST=pg'
+    ports:
+      - '8080:8080'
+    restart: unless-stopped
