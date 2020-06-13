@@ -8,8 +8,17 @@
 		{
 			"name": "Get items",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "WbvflNFMHMN0L1ZA7IH1V2jL2Odnpuh8WGOB_Ron6H4",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "localhost:8080/v1/item",
 					"host": [
@@ -33,6 +42,11 @@
 						"key": "Content-Type",
 						"name": "Content-Type",
 						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "WbvflNFMHMN0L1ZA7IH1V2jL2Odnpuh8WGOB_Ron6H4",
 						"type": "text"
 					}
 				],
@@ -63,7 +77,13 @@
 			"name": "Get page",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "WbvflNFMHMN0L1ZA7IH1V2jL2Odnpuh8WGOB_Ron6H4",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "localhost:8080/v1/item?page={{$randomInt}}&per_page={{$randomInt}}",
 					"host": [
@@ -92,7 +112,13 @@
 			"name": "Get item",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "WbvflNFMHMN0L1ZA7IH1V2jL2Odnpuh8WGOB_Ron6H4",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "localhost:8080/v1/item/{{$randomInt}}",
 					"host": [
@@ -112,7 +138,13 @@
 			"name": "Delete item",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "WbvflNFMHMN0L1ZA7IH1V2jL2Odnpuh8WGOB_Ron6H4",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "localhost:8080/v1/item/{{$randomInt}}",
 					"host": [
@@ -132,7 +164,13 @@
 			"name": "Update item",
 			"request": {
 				"method": "PATCH",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "WbvflNFMHMN0L1ZA7IH1V2jL2Odnpuh8WGOB_Ron6H4",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"name\": \"{{$randomProductName}}\"\n}\n",
@@ -143,7 +181,7 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/v1/item/{{$randomInt}}",
+					"raw": "localhost:8080/v1/item/2",
 					"host": [
 						"localhost"
 					],
@@ -151,7 +189,7 @@
 					"path": [
 						"v1",
 						"item",
-						"{{$randomInt}}"
+						"2"
 					]
 				}
 			},

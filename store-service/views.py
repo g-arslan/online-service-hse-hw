@@ -2,11 +2,12 @@ from aiohttp import web
 
 import db
 from settings import config
-from utils import clean_data
+from utils import clean_data, gen_json_response, login_required
 
 
 async def index(request):
     return web.Response(text='Hello world')
+
 
 async def get_items_from_db(app, id=None, offset=None, limit=None):
     async with app['db'].acquire() as conn:
@@ -23,10 +24,11 @@ async def get_items_from_db(app, id=None, offset=None, limit=None):
         return records
 
 
+@login_required
 async def get_item(request):
     async with request.app['db'].acquire() as conn:
         if request.match_info.get('id'):
-            records = await get_items_from_db(request.app, id = request.match_info.get('id'))
+            records = await get_items_from_db(request.app, id=request.match_info.get('id'))
         elif request.rel_url.query.get('page'):
             page = int(request.rel_url.query.get('page')) - 1
             per_page = int(request.rel_url.query.get('per_page', config['constants']['per_page']))
@@ -42,10 +44,12 @@ async def get_item(request):
             data = await cursor.fetchall()
             data = [dict(i) for i in data][0]['tbl_row_count']
 
-            return web.json_response({'code': 200, 'response': {'items': items, 'count': data}})
+            return gen_json_response({'items': items, 'count': data})
         else:
-            return web.json_response({'code': 404, 'response': 'Empty set'}, status=404)
+            return gen_json_response('Empty set', 404)
 
+
+@login_required
 async def post_item(request):
     async with request.app['db'].acquire() as conn:
         data = await request.json()
@@ -54,21 +58,25 @@ async def post_item(request):
             {'name': data['name'], 'code': data['code'], 'category': data['category']}
         ))
 
-        return web.json_response({'code': 200, 'response': 'OK'})
+        return gen_json_response('OK')
 
+
+@login_required
 async def del_item(request):
     async with request.app['db'].acquire() as conn:
         if not await get_items_from_db(request.app, id=request.match_info.get('id')):
-            return web.json_response({'code': 404, 'response': 'Not found'}, status=404)
+            return gen_json_response('Not found', 404)
 
         cursor = await conn.execute(db.items.delete().where(db.items.c.id == request.match_info.get('id')))
 
-        return web.json_response({'code': 201, 'response': 'OK'}, status=201)
+        return gen_json_response('OK', 201)
 
+
+@login_required
 async def patch_item(request):
     async with request.app['db'].acquire() as conn:
         if not await get_items_from_db(request.app, id=request.match_info.get('id')):
-            return web.json_response({'code': 404, 'response': 'Not found'}, status=404)
+            return gen_json_response('Not found', 404)
 
         data = await request.json()
         cleaned_data = clean_data(data, ['name', 'code', 'category'])
@@ -77,4 +85,4 @@ async def patch_item(request):
             cleaned_data
         ))
 
-        return web.json_response({'code': 200, 'response': 'OK'})
+        return gen_json_response('OK')
