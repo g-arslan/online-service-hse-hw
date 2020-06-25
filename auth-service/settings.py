@@ -8,6 +8,13 @@ config = {
         'host': os.getenv('DB_HOST', 'localhost'),
         'port': os.getenv('DB_PORT', 5432),
     },
+    'mq': {
+        'host': os.getenv('MQ_HOST', 'localhost'),
+        'port': os.getenv('MQ_PORT', 5672),
+        'user': os.getenv('MQ_USER', 'guest'),
+        'password': os.getenv('MQ_PASSWORD', 'guest'),
+        'email_queue': os.getenv('MQ_EMAIL_QUEUE', 'email'),
+    },
     'constants': {
         'token_length': os.getenv('TOKEN_LENGTH', 32),
         'access_token_lifetime': os.getenv('ACCESS_TOKEN_LIFETIME', 300),

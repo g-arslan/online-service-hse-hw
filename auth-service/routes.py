@@ -1,4 +1,4 @@
-from views import index, post_signup, post_signin, post_validate, post_refresh
+from views import index, post_signup, post_signin, post_validate, post_refresh, get_activate
 
 def setup_routes(app):
     app.router.add_get('/', index)
@@ -6,3 +6,4 @@ def setup_routes(app):
     app.router.add_post('/signin', post_signin)
     app.router.add_post('/validate', post_validate)
     app.router.add_post('/refresh', post_refresh)
+    app.router.add_get('/activate/{activate_url}', get_activate)

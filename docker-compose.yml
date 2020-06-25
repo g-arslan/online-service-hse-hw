@@ -13,16 +13,34 @@ services:
       - 'POSTGRES_PASSWORD=$POSTGRES_PASSWORD'
     restart: unless-stopped
 
+  mq:
+    image: rabbitmq:3-management
+    restart: unless-stopped
+
+  email_sender:
+    build: 'send-email-service'
+    depends_on:
+      - mq
+    environment:
+      - 'MQ_HOST=mq'
+    command: >
+      sh -c './wait-for-it.sh mq:5672 && python -u main.py'
+
   auth:
     build: 'auth-service'
     depends_on:
       - auth_db
+      - mq
+      - email_sender
     environment:
       - 'DB_PASSWORD=$POSTGRES_PASSWORD'
       - 'DB_HOST=auth_db'
+      - 'MQ_HOST=mq'
     ports:
       - '8081:8080'
     restart: unless-stopped
+    command: >
+      sh -c './wait-for-it.sh mq:5672 && ./wait-for-it.sh auth_db:5432 && python -u db_init.py && python -u main.py'
 
   web:
     build: 'store-service'
@@ -36,3 +54,5 @@ services:
     ports:
       - '8080:8080'
     restart: unless-stopped
+    command: >
+      sh -c './wait-for-it.sh db:5432 && python -u db_init.py && python -u main.py'
