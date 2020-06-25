@@ -56,3 +56,4 @@ services:
     restart: unless-stopped
     command: >
       sh -c './wait-for-it.sh db:5432 && python -u db_init.py && python -u main.py'
+
