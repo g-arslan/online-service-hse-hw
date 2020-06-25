@@ -1,19 +1,38 @@
 version: '3'
 
 services:
-  pg:
+  db:
     image: postgres
     environment:
       - 'POSTGRES_PASSWORD=$POSTGRES_PASSWORD'
     restart: unless-stopped
 
+  auth_db:
+    image: postgres
+    environment:
+      - 'POSTGRES_PASSWORD=$POSTGRES_PASSWORD'
+    restart: unless-stopped
+
+  auth:
+    build: 'auth-service'
+    depends_on:
+      - auth_db
+    environment:
+      - 'DB_PASSWORD=$POSTGRES_PASSWORD'
+      - 'DB_HOST=auth_db'
+    ports:
+      - '8081:8080'
+    restart: unless-stopped
+
   web:
     build: 'store-service'
     depends_on:
-      - pg
+      - db
+      - auth
     environment:
       - 'DB_PASSWORD=$POSTGRES_PASSWORD'
-      - 'DB_HOST=pg'
+      - 'DB_HOST=db'
+      - 'AUTH_HOST=auth'
     ports:
       - '8080:8080'
     restart: unless-stopped
