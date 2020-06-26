@@ -1,4 +1,6 @@
 import datetime
+import json
+import secrets
 
 from aiohttp import web
 
@@ -24,12 +26,43 @@ async def post_signup(request):
         if records:
             return gen_json_response('Email already registered', 409)
 
+        activate_url = secrets.token_urlsafe(config['constants']['token_length'])
+
         cursor = await conn.execute(db.users.insert().values({
             'email': data['email'],
             'password': data['password'],  # TODO: hash password
+            'is_activated': False,
+            'activate_url': activate_url,
+        }))
+
+        request.app['channel'].basic_publish(exchange='', routing_key=config['mq']['email_queue'], body=json.dumps({
+            'email': data['email'],
+            'activate_url': activate_url,
         }))
 
         return gen_json_response('OK')
+
+
+async def get_activate(request):
+    if 'activate_url' not in request.match_info:
+        return gen_json_response('No activation key', 400)
+
+    async with request.app['db'].acquire() as conn:
+        cursor = await conn.execute(
+            db.users.select().where(db.users.c.activate_url == request.match_info.get('activate_url')))
+        records = await cursor.fetchall()
+
+        if not records:
+            return gen_json_response('No such activation key', 400)
+
+        user = [dict(i) for i in records][0]
+
+        cursor = await conn.execute(db.users.update().where(db.users.c.id == user['id']).values({
+            'is_activated': True,
+            'activate_url': None,
+        }))
+
+        return gen_json_response('Activated')
 
 
 async def post_signin(request):
@@ -46,6 +79,9 @@ async def post_signin(request):
             return gen_json_response('No such email', 400)
 
         user = [dict(i) for i in records][0]
+
+        if not user['is_activated']:
+            return gen_json_response('Activate your account', 400)
 
         if user['password'] != data['password']:
             return gen_json_response('Incorrect password', 400)

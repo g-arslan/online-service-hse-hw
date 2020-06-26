@@ -58,7 +58,7 @@ async def post_item(request):
             {'name': data['name'], 'code': data['code'], 'category': data['category']}
         ))
 
-        return gen_json_response('OK')
+        return gen_json_response('OK', 201)
 
 
 @login_required

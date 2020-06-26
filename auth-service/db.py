@@ -1,6 +1,6 @@
 import aiopg.sa
 from sqlalchemy import (
-    MetaData, Table, Column, String, Integer, DateTime
+    MetaData, Table, Column, String, Integer, DateTime, Boolean
 )
 
 from settings import config
@@ -13,6 +13,8 @@ users = Table(
     Column('id', Integer, primary_key=True),
     Column('email', String, nullable=False),
     Column('password', String, nullable=False),
+    Column('is_activated', Boolean, nullable=False),
+    Column('activate_url', String),
     Column('access_token', String),
     Column('access_token_expiration_time', DateTime),
     Column('refresh_token', String),
